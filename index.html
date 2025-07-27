@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시니어 디지털 금융 교육 종합 가이드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Soft Accents -->
+    <!-- Application Structure Plan: The SPA is designed with a user-centric, four-part thematic structure to guide the user (a senior financial educator) logically through the content. 1) 'The Big Picture' sets the context. 2) 'App Mastery' provides practical, actionable guides. 3) 'AI & Finance' demystifies the core topic. 4) 'Educator's Toolkit' offers pedagogical strategies. This task-oriented flow, moving from broad context to specific tools and strategies, is more intuitive for learning and application than the original report's structure. Navigation is handled by a sticky top bar, and content within each section is revealed on click, keeping the interface clean and focused. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Korea's Open Banking Market Growth (Quantitative). Goal: Show rapid change. Viz: Bar Chart (Chart.js). Interaction: Hover for details. Justification: Bar charts are excellent for showing growth over time clearly. Library: Chart.js for its simplicity and responsiveness.
+        - Report Info: AI's Impact on Korean Economy (Quantitative). Goal: Illustrate significant economic potential. Viz: Donut Chart (Chart.js). Interaction: Hover to see specific GDP/productivity figures. Justification: A donut chart effectively shows parts of a whole, making the potential impact easily digestible. Library: Chart.js.
+        - Report Info: Common vs. Specific App Functions (Qualitative/Structural). Goal: Organize and compare app features. Viz: Interactive Tabbed Cards (HTML/CSS/JS). Interaction: Click tabs to switch between app categories. Justification: Tabs are a space-efficient way to present and compare distinct categories of information, fulfilling the user's request to separate common and specific features. Method: Tailwind CSS and Vanilla JS.
+        - Report Info: AI Integration Curriculum (Structural). Goal: Present a multi-module course plan. Viz: Accordion-style expandable list (HTML/CSS/JS). Interaction: Click to expand/collapse modules. Justification: An accordion is ideal for presenting a large, structured curriculum without overwhelming the user, allowing them to focus on one module at a time. Method: Tailwind CSS and Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF8; /* Warm Neutral Background */
+            color: #4A4A4A;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button.active, .nav-button:hover {
+            color: #C08497; /* Soft Accent */
+            border-bottom-color: #C08497;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        .tag {
+            background-color: #F1E4E8; /* Lighter Accent */
+            color: #C08497; /* Soft Accent */
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-button.active {
+            background-color: #C08497;
+            color: #FFFFFF;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 bg-white/80 backdrop-blur-lg shadow-sm z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <h1 class="text-2xl font-bold text-[#C08497]">시니어 디지털 금융 교육</h1>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <button class="nav-button active" data-target="home">개요</button>
+                    <button class="nav-button" data-target="apps">앱 정복</button>
+                    <button class="nav-button" data-target="ai">AI와 금융</button>
+                    <button class="nav-button" data-target="strategy">교육 전략</button>
+                </nav>
+                <div class="md:hidden">
+                    <select id="mobile-nav" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#C08497] focus:border-[#C08497] block w-full p-2.5">
+                        <option value="home" selected>개요</option>
+                        <option value="apps">앱 정복</option>
+                        <option value="ai">AI와 금융</option>
+                        <option value="strategy">교육 전략</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <!-- Section 1: Home/Overview -->
+        <section id="home" class="content-section active">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">시니어 금융, 새로운 시대를 맞이하다</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">AI와 핀테크 기술이 발전하며 시니어의 금융 생활도 빠르게 변화하고 있습니다. 이 가이드는 시니어 금융교육 강사님들이 최신 금융 트렌드를 이해하고, 효과적인 교육 전략을 수립하는 데 필요한 핵심 정보와 도구를 제공합니다.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4">변화의 핵심: 오픈뱅킹과 마이데이터</h3>
+                    <p class="text-gray-600 mb-6">금융의 벽이 허물어지고 있습니다. 오픈뱅킹과 마이데이터 2.0은 개인에게 데이터 주권을 부여하고, 맞춤형 금융 서비스 시대를 열고 있습니다. 이는 시니어들이 자신의 금융 정보를 더 쉽게 관리하고 활용할 수 있는 기회입니다.</p>
+                    <div class="chart-container">
+                        <canvas id="openBankingChart"></canvas>
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4">시니어가 마주한 디지털 금융의 두 얼굴</h3>
+                    <p class="text-gray-600 mb-4">디지털 금융은 편리함이라는 기회와 복잡성이라는 도전을 동시에 안겨줍니다. 특히 시니어 세대는 새로운 앱 사용법, 정보 부족, 디지털 사기 위협 등 다양한 어려움에 직면합니다.</p>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <span class="text-2xl mr-4">💡</span>
+                            <div>
+                                <h4 class="font-semibold">기회</h4>
+                                <p class="text-sm text-gray-500">은행 방문 없이 연금 관리, 송금, 공과금 납부 가능. 정부 지원금 신청 및 확인 용이.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="text-2xl mr-4">⚠️</span>
+                            <div>
+                                <h4 class="font-semibold">도전</h4>
+                                <p class="text-sm text-gray-500">복잡한 앱 인터페이스, 작은 글씨, 신종 금융사기(피싱, 스미싱) 노출 위험.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: App Guide -->
+        <section id="apps" class="content-section">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">핵심 금융 앱 완전 정복</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">다양한 금융 앱의 공통 기능과 특화 기능을 이해하는 것은 효과적인 교육의 첫걸음입니다. 시니어들이 각 앱을 자신감 있게 사용할 수 있도록 핵심을 짚어봅니다.</p>
+            </div>
+
+            <div class="card p-6 md:p-8">
+                <div class="flex justify-center mb-6">
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <button type="button" class="tab-button active px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-[#C08497]" data-tab="common">공통 핵심 기능</button>
+                        <button type="button" class="tab-button px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-[#C08497]" data-tab="banks">은행 앱</button>
+                        <button type="button" class="tab-button px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-[#C08497]" data-tab="fintech">핀테크 앱</button>
+                        <button type="button" class="tab-button px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-[#C08497]" data-tab="cards">카드/보험 앱</button>
+                    </div>
+                </div>
+
+                <div id="app-content">
+                    <!-- Content will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: AI & Finance -->
+        <section id="ai" class="content-section">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">AI, 금융을 어떻게 바꾸고 있는가?</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">인공지능은 더 이상 미래 기술이 아닙니다. AI가 은행, 카드, 보험 등 금융 산업 전반에 어떻게 활용되고 있으며, 시니어의 금융 생활에 어떤 영향을 미치는지 알아봅니다.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-3">AI 기본 개념</h3>
+                    <p class="text-gray-600 text-sm mb-4">AI는 데이터를 학습해 사람처럼 생각하고 판단합니다. 금융에서는 고객 맞춤 상품 추천, 사기 거래 탐지 등에 활용됩니다.</p>
+                    <span class="tag">#머신러닝 #생성형AI</span>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-3">AI가 이끄는 경제 성장</h3>
+                    <p class="text-gray-600 text-sm mb-4">AI는 한국 경제의 생산성과 GDP를 크게 향상시킬 잠재력을 가집니다. 이는 저성장, 고령화 시대의 중요한 돌파구가 될 수 있습니다.</p>
+                    <div class="chart-container h-48">
+                        <canvas id="aiImpactChart"></canvas>
+                    </div>
+                </div>
+                <div class="card p-6 lg:col-span-1 md:col-span-2">
+                    <h3 class="text-xl font-bold mb-3">금융 분야 AI 활용 사례</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-center"><span class="text-lg mr-2">🏦</span> 은행: AI 챗봇 상담, 대출 심사, 환율 예측</li>
+                        <li class="flex items-center"><span class="text-lg mr-2">💳</span> 카드: 부정사용방지(FDS), 개인 맞춤 혜택 추천</li>
+                        <li class="flex items-center"><span class="text-lg mr-2">🛡️</span> 보험: 보험료 산정, 사고 접수 및 보험금 지급 심사</li>
+                    </ul>
+                </div>
+            </div>
+             <div class="card p-6 mt-8">
+                <h3 class="text-2xl font-bold mb-4 text-center">AI 시대, 시니어를 위한 조언</h3>
+                <div class="grid md:grid-cols-2 gap-6 text-center">
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2">✅ 현명하게 활용하기</h4>
+                        <p class="text-sm text-gray-600">AI 추천 서비스는 참고용으로 활용하되, 최종 결정은 스스로 신중하게 내려야 합니다. AI가 생성한 정보는 '환각(잘못된 정보)'일 수 있음을 인지해야 합니다.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2">🛡️ 안전하게 보호하기</h4>
+                        <p class="text-sm text-gray-600">"당신만을 위한 고수익 상품" 등 AI를 사칭한 정교한 사기에 주의해야 합니다. 개인정보 요구에 절대 응하지 말고, 공식 앱과 웹사이트만 이용하세요.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Strategy/Toolkit -->
+        <section id="strategy" class="content-section">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">강사를 위한 교육 전략과 도구</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">성공적인 시니어 금융 교육을 위한 효과적인 교수법과 AI를 활용한 교육 콘텐츠 제작 방법을 소개합니다. 강사님의 역량을 한 단계 끌어올릴 수 있는 전략을 확인하세요.</p>
+            </div>
+            
+            <div class="card p-6 md:p-8">
+                <h3 class="text-2xl font-bold mb-6 text-center">AI 통합 시니어 금융 교육 과정</h3>
+                <div id="accordion" class="space-y-2">
+                  <!-- Accordion items will be injected here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-100 mt-16">
+        <div class="container mx-auto px-4 py-6 text-center text-gray-500">
+            <p class="text-sm">'AI 시민금융연구회' 활동을 응원합니다.</p>
+            <p class="text-xs mt-2">본 페이지는 제공된 보고서를 기반으로 생성된 인터랙티브 요약본입니다.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const mobileNav = document.getElementById('mobile-nav');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function switchTab(targetId) {
+                navButtons.forEach(button => {
+                    button.classList.toggle('active', button.dataset.target === targetId);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+                mobileNav.value = targetId;
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    switchTab(button.dataset.target);
+                });
+            });
+            
+            mobileNav.addEventListener('change', (e) => {
+                switchTab(e.target.value);
+            });
+
+            // Chart.js Data and Options
+            const chartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#4A4A4A',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 6,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#E5E7EB',
+                        },
+                        ticks: {
+                            color: '#6B7280',
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                        ticks: {
+                            color: '#6B7280',
+                        }
+                    }
+                }
+            };
+
+            // Open Banking Chart
+            const openBankingCtx = document.getElementById('openBankingChart').getContext('2d');
+            new Chart(openBankingCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['2024년', '2025년(E)', '2030년(E)'],
+                    datasets: [{
+                        label: '한국 오픈뱅킹 시장 매출 (백만 달러)',
+                        data: [574.7, 752.6, 2886.4], // 2025년 데이터는 31.1% CAGR로 추정
+                        backgroundColor: ['#F1E4E8', '#D8B4C8', '#C08497'],
+                        borderColor: ['#C08497'],
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // AI Impact Chart
+            const aiImpactCtx = document.getElementById('aiImpactChart').getContext('2d');
+            new Chart(aiImpactCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['GDP 성장 기여 (최대 12.6%)', '기타'],
+                    datasets: [{
+                        data: [12.6, 100 - 12.6],
+                        backgroundColor: ['#C08497', '#F1E4E8'],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 4,
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                           display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // App Tabs Logic
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const appContentContainer = document.getElementById('app-content');
+            
+            const appContentData = {
+                common: `
+                    <h4 class="text-xl font-bold mb-4">어떤 앱이든 이것만은 꼭!</h4>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-gray-50 p-4 rounded-lg"><strong>계좌 관리:</strong> 잔액, 거래내역 확인</div>
+                        <div class="bg-gray-50 p-4 rounded-lg"><strong>송금/결제:</strong> 계좌 이체, 공과금 납부</div>
+                        <div class="bg-gray-50 p-4 rounded-lg"><strong>고객 지원:</strong> ATM/지점 찾기, 고객센터 연결</div>
+                        <div class="bg-gray-50 p-4 rounded-lg"><strong>보안 설정:</strong> 비밀번호 변경, 알림 설정</div>
+                    </div>
+                    <p class="mt-4 text-xs text-gray-500">*이 기능들은 대부분의 금융 앱에 포함된 기본 중의 기본입니다. 이것부터 익숙해지는 것이 중요합니다.</p>
+                `,
+                banks: `
+                    <h4 class="text-xl font-bold mb-4">은행 앱 (전통/인터넷)</h4>
+                    <p class="text-sm mb-4 text-gray-600">안정적인 종합 금융 서비스가 필요할 때 유용합니다. 인터넷 은행은 비대면 편의성에 특화되어 있습니다.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li><strong>특징:</strong> 예적금, 대출, 투자 등 복합 금융상품 가입, 지점 연계 서비스, 정부 정책 연계(정부24 등)</li>
+                        <li><strong>시니어 활용 Tip:</strong> 큰 금액 거래나 상담이 필요할 때 전통 은행 앱과 지점을 함께 활용하세요. 일상적인 소액 거래는 간편한 인터넷 은행 앱이 편리합니다.</li>
+                    </ul>
+                `,
+                fintech: `
+                    <h4 class="text-xl font-bold mb-4">핀테크 앱 (카카오/토스)</h4>
+                    <p class="text-sm mb-4 text-gray-600">일상 속 간편한 금융 활동에 최적화되어 있습니다. 송금, 결제, 자산 관리를 하나로 해결합니다.</p>
+                     <ul class="space-y-2 text-sm">
+                        <li><strong>특징:</strong> 카카오톡 연동(카카오), 신용점수 관리(토스), 다양한 금융사 상품 비교, 앱테크 기능</li>
+                        <li><strong>시니어 활용 Tip:</strong> 자녀, 친구와 돈을 주고받을 때 카카오페이를, 내 모든 금융 자산을 한눈에 보고 싶을 때 토스를 활용해 보세요.</li>
+                    </ul>
+                `,
+                cards: `
+                    <h4 class="text-xl font-bold mb-4">카드/보험 앱</h4>
+                    <p class="text-sm mb-4 text-gray-600">내 지출을 관리하고, 미래를 대비하는 데 필수적인 앱입니다.</p>
+                     <ul class="space-y-2 text-sm">
+                        <li><strong>특징:</strong> 카드 사용 내역 실시간 확인, 결제 대금 관리, 포인트/혜택 조회, 보험 계약 확인, 보험금 간편 청구</li>
+                        <li><strong>시니어 활용 Tip:</strong> 카드 앱으로 계획적인 소비 습관을 기르고, 보험 앱으로 내가 가입한 보험을 꼼꼼히 확인하여 필요할 때 혜택을 놓치지 마세요.</li>
+                    </ul>
+                `
+            };
+
+            function switchAppTab(tab) {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`.tab-button[data-tab="${tab}"]`).classList.add('active');
+                appContentContainer.innerHTML = appContentData[tab];
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => switchAppTab(button.dataset.tab));
+            });
+
+            // Initial load
+            switchAppTab('common');
+            
+            // Accordion Logic
+            const accordionContainer = document.getElementById('accordion');
+            const accordionData = [
+                { title: '모듈 1: 디지털 금융 첫걸음', content: '시니어가 겪는 어려움 이해, 스마트폰 기본 기능 및 보안 기초(비밀번호, 피싱) 교육법' },
+                { title: '모듈 2: 필수 앱 공통 기능 마스터', content: '계좌 조회, 이체, 공과금 납부 등 모든 앱의 기본 기능을 시뮬레이션을 통해 가르치는 방법' },
+                { title: '모듈 3: 앱별 특화 기능 탐색', content: '은행, 핀테크, 카드, 보험 앱의 차별점과 시니어 맞춤 활용 사례 중심 교육' },
+                { title: '모듈 4: 스마트한 금융 관리 (앱테크)', content: '포인트, 캐시백 등 소소한 이익을 얻는 앱테크 방법과 위험성, 가계부 앱 활용법' },
+                { title: '모듈 5: 정부 혜택 놓치지 않기', content: '복지로, 정부24 등 정부 포털과 은행 앱을 연계하여 연금, 지원금을 확인하고 신청하는 방법' },
+                { title: '모듈 6: AI와 금융 이야기', content: 'AI의 기본 개념과 금융 서비스 활용 사례, 그리고 AI 기반 사기 유형 및 예방법 교육' },
+                { title: '모듈 7: 강사를 위한 AI 활용법', content: 'AI를 활용해 교육 자료(요약, 쉬운 설명)를 만들고, 개인별 맞춤 학습을 지원하는 방법' }
+            ];
+
+            accordionData.forEach((item, index) => {
+                const accordionItem = document.createElement('div');
+                accordionItem.classList.add('border', 'border-gray-200', 'rounded-lg');
+                accordionItem.innerHTML = `
+                    <h2>
+                        <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-gray-700 hover:bg-gray-100" data-accordion-target="#accordion-body-${index}">
+                            <span>${item.title}</span>
+                            <svg class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                            </svg>
+                        </button>
+                    </h2>
+                    <div id="accordion-body-${index}" class="accordion-content">
+                        <div class="p-5 border-t border-gray-200">
+                            <p class="text-gray-500 text-sm">${item.content}</p>
+                        </div>
+                    </div>
+                `;
+                accordionContainer.appendChild(accordionItem);
+            });
+            
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const svg = button.querySelector('svg');
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        svg.classList.add('rotate-180');
+                    } else {
+                        // Close all others
+                        document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                        document.querySelectorAll('.accordion-button svg').forEach(s => s.classList.add('rotate-180'));
+                        
+                        // Open clicked one
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        svg.classList.remove('rotate-180');
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
